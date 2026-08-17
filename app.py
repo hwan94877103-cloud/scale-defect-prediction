@@ -17,6 +17,7 @@ Tab 2 | 근본 원인 분석 및 XAI       — Set_B + GradientBoosting + SHAP
 from __future__ import annotations
 
 import pickle
+import os
 from pathlib import Path
 
 import matplotlib.font_manager as fm
@@ -84,11 +85,25 @@ LABEL_KO = {
 def setup_font() -> None:
     """한글 폰트 설정.
 
+    이름으로만 폰트를 찾으면(fontManager.ttflist 스캔), 배포 환경에서 폰트를
+    설치한 직후 matplotlib이 아직 그 폰트를 인식하지 못하는 경우가 있다.
+    이를 막기 위해 apt로 설치되는 나눔고딕의 실제 파일 경로를 알고 있다면
+    이름 검색보다 먼저 직접 등록한다 (packages.txt에 fonts-nanum 필요).
+
     seaborn을 쓸 경우 set_style() 이후에 폰트를 지정해야 한다.
     순서가 뒤바뀌면 rcParams가 덮어씌워져 한글이 □로 깨진다.
     """
+    # Streamlit Cloud(Debian) 에서 fonts-nanum 설치 시 생성되는 경로.
+    # 존재하면 이름 검색과 무관하게 직접 등록해 인식 실패를 막는다.
+    for p in [
+        "/usr/share/fonts/truetype/nanum/NanumGothic.ttf",
+        "/usr/share/fonts/truetype/nanum/NanumGothicBold.ttf",
+    ]:
+        if os.path.exists(p):
+            fm.fontManager.addfont(p)
+
     installed = {f.name for f in fm.fontManager.ttflist}
-    for cand in ["Malgun Gothic", "AppleGothic", "NanumGothic",
+    for cand in ["NanumGothic", "Malgun Gothic", "AppleGothic",
                  "Noto Sans CJK KR", "Noto Sans KR"]:
         if cand in installed:
             plt.rcParams["font.family"] = "sans-serif"
