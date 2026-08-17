@@ -1,0 +1,11 @@
+__pycache__/
+*.py[cod]
+*.pkl
+.ipynb_checkpoints/
+.venv/
+venv/
+.DS_Store
+.vscode/
+
+# Streamlit Cloud 배포용 — 대시보드 아티팩트는 예외로 포함
+!artifacts/dashboard.pkl
